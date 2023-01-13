@@ -43,7 +43,7 @@ function ShortenerForm(props: RouteComponentProps) {
 					textShadow: "0 2px 2px #ddd;",
 					letterSpacing: "-1px"
 				}}>
-					PodCodar Short Url
+					PodCodar Short Url - Deployado automaticamente!
 				</h1>
 			</header>
 			<body style={{ display: "flex", alignItems: "center", flexDirection: "column" }}>
