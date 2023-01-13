@@ -4,6 +4,10 @@ on:
   push:
     branches: [with-cicd]
 
+env:
+  REACT_APP_DOMAIN: ${{ secrets.REACT_APP_DOMAIN }}
+  REACT_APP_API_URL: ${{ secrets.REACT_APP_API_URL }}
+
 jobs:
   build:
     name: build
@@ -17,6 +21,7 @@ jobs:
         with:
           node-version: 18
           cache: npm
+
       
       - run: | 
             yarn
@@ -27,3 +32,26 @@ jobs:
           name: build
           path: build/
 
+  deploy:
+    name: deploy
+    runs-on: ubuntu-latest
+    needs: build
+
+    steps:
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v1
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: us-west-1
+    
+    - uses: actions/download-artifact@v3
+      with:
+        name: build
+        path: build
+
+    - name: Delete all files from S3 Bucket
+      run: aws s3 rm s3://podcodar-url-shortener --recursive
+
+    - name: Upload files to S3 bucket
+      run: aws s3 cp /home/runner/work/url-shortener-app/url-shortener-app/build s3://podcodar-url-shortener/ --recursive
